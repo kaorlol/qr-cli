@@ -2,6 +2,14 @@
 name = "qr-reader"
 version = "0.1.0"
 edition = "2021"
+authors = ["kaoru <@901597854274052106>"]
+description = "A qrcode reader that prints out the data of the qrcode"
+repository = "https://github.com/kaorlol/qr-reader"
+license = "MIT"
+keywords = ["qr", "qrcode", "reader", "qrcode-reader"]
+
+[badges]
+github = { repository = "kaorlol/qr-reader" }
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
