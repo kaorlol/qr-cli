@@ -17,5 +17,7 @@ github = { repository = "kaorlol/qr-reader" }
 anyhow = "1.0.75"
 base64 = "0.21.5"
 image = "0.24.7"
+lazy_static = "1.4.0"
+regex = "1.10.2"
 reqwest = { version = "0.11.22", features = ["blocking"] }
 rqrr = "0.6.0"
