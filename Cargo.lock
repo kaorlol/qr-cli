@@ -948,8 +948,8 @@ dependencies = [
 ]
 
 [[package]]
-name = "qr-reader"
-version = "0.1.0"
+name = "qr-cli"
+version = "0.2.0"
 dependencies = [
  "anyhow",
  "base64",

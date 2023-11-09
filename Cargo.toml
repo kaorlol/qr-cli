@@ -1,6 +1,6 @@
 [package]
-name = "qr-reader"
-version = "0.1.0"
+name = "qr-cli"
+version = "0.2.0"
 edition = "2021"
 authors = ["kaoru <@901597854274052106>"]
 description = "A qrcode reader that prints out the data of the qrcode"
