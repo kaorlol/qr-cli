@@ -2,8 +2,7 @@ use anyhow::Context;
 use base64::{engine::general_purpose, Engine as _};
 use image::{io::Reader as ImageReader, DynamicImage};
 use rqrr::PreparedImage;
-use std::path::PathBuf;
-use std::{env, io::Cursor};
+use std::{env, io::Cursor, path::PathBuf};
 
 fn grab_image(url: &str) -> anyhow::Result<DynamicImage, anyhow::Error> {
     let response = reqwest::blocking::get(url).context("Failed to make the HTTP request")?;
@@ -19,19 +18,18 @@ fn grab_image(url: &str) -> anyhow::Result<DynamicImage, anyhow::Error> {
     Ok(image)
 }
 
-fn decode_base64_path(path: &str) -> Result<image::DynamicImage, anyhow::Error> {
-    let base64_regex = regex::Regex::new(r#"^data:image/[^;]+;base64,([A-Za-z0-9+/]+={0,2})$"#).unwrap();
-    if let Some(captures) = base64_regex.captures(path) {
-        let base64_part = captures.get(1).unwrap().as_str();
-
-        let data = general_purpose::STANDARD.decode(base64_part.as_bytes())
-            .map_err(|_| anyhow::anyhow!("Failed to decode the base64 path"))?;
-        
-        let reader = ImageReader::new(std::io::Cursor::new(data));
+fn decode_base64(data: &str) -> anyhow::Result<DynamicImage, anyhow::Error> {
+    let prefix_regex = regex::Regex::new(r"data:image/[^;]+;base64,").unwrap();
+    let base64 = prefix_regex.replace(data, "");
+    let result = general_purpose::STANDARD.decode(base64.as_bytes());
+        // .map_err(|_| anyhow::anyhow!("Failed to decode the base64 path"))?;
+    
+    if result.is_ok() {
+        let reader = ImageReader::new(Cursor::new(result?));
         let image = reader.with_guessed_format()?
             .decode()
             .context("Failed to decode the image")?;
-        
+
         return Ok(image);
     }
 
@@ -49,11 +47,12 @@ fn load_image(path: &str) -> Result<DynamicImage, anyhow::Error> {
         return grab_image(path);
     }
 
-    if path.starts_with("data:image/") {
-        return decode_base64_path(path);
+    match decode_base64(path) {
+        Ok(image) => return Ok(image),
+        Err(_) => {}
     }
 
-    Ok(image::open(path)?)
+    Err(anyhow::anyhow!("Input is not a valid path, URL or base64 string"))
 }
 
 // TODO: Use clap for argument parsing
